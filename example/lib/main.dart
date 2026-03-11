@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:flutter/services.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 
 void main() {
@@ -29,8 +26,7 @@ class _MyAppState extends State<MyApp> {
           color: Colors.red,
           child: ModelViewerPlus(
             modelPath: 'assets/models/heart.glb',
-            iblPath: 'assets/models/giuseppe_bridge_4k_ibl.ktx',
-            // backgroundPath: 'assets/models/san_giuseppe_bridge_4k.hdr',
+            iblPath: 'assets/models/default_env_ibl.ktx',
           ),
         ),
       ),

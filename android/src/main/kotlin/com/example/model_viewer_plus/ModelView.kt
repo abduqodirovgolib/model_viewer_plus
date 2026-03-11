@@ -30,12 +30,12 @@ class ModelView : LinearLayout {
     private lateinit var choreographer: Choreographer
     private val frameScheduler = FrameCallback()
     private lateinit var modelViewer: CustomModelViewer
-    private val automation = AutomationEngine()
 
     // State variables
     private var loadStartTime = 0L
     private var loadStartFence: Fence? = null
     private val viewerContent = AutomationEngine.ViewerContent()
+    private var autoScaleEnabled = true
     private var modelLoaded = false
 
     // Constructors
@@ -107,7 +107,7 @@ class ModelView : LinearLayout {
             return
         }
 
-        if (automation.viewerOptions.autoScaleEnabled) {
+        if (autoScaleEnabled) {
             modelViewer.transformToUnitCube()
         } else {
             modelViewer.clearRootTransform()
@@ -163,7 +163,6 @@ class ModelView : LinearLayout {
      */
     fun destroy() {
         modelViewer.destroyModel()
-        automation.stopRunning()
         Log.d(TAG, "ModelView destroyed")
     }
 
