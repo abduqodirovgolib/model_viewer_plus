@@ -1,7 +1,7 @@
 name: model_viewer_plus
 description: "A new Flutter project."
 version: 0.0.1
-homepage:
+homepage: https://github.com/abduqodirovgolib/model_viewer_plus
 
 environment:
   sdk: ^3.9.2
