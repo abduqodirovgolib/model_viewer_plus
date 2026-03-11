@@ -1,0 +1,35 @@
+PODS:
+  - Flutter (1.0.0)
+  - GLTFSceneKit (0.3.0)
+  - integration_test (0.0.1):
+    - Flutter
+  - model_viewer_plus (0.0.1):
+    - Flutter
+    - GLTFSceneKit
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
+  - model_viewer_plus (from `.symlinks/plugins/model_viewer_plus/ios`)
+
+SPEC REPOS:
+  trunk:
+    - GLTFSceneKit
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
+  model_viewer_plus:
+    :path: ".symlinks/plugins/model_viewer_plus/ios"
+
+SPEC CHECKSUMS:
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  GLTFSceneKit: d1b437c514ba2aed5555afb0fddd64e030612d57
+  integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
+  model_viewer_plus: c34340c1cbc742e9357b9e18de81c61b2c592444
+
+PODFILE CHECKSUM: 3c63482e143d1b91d2d2560aee9fb04ecc74ac7e
+
+COCOAPODS: 1.16.2
