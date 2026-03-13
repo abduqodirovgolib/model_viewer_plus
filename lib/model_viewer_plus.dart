@@ -16,7 +16,17 @@ class ModelViewerPlus extends StatefulWidget {
   /// Path to the skybox texture file of type .hdr/.exr used for the 3D environment from assets.
   final String? backgroundPath;
 
-  const ModelViewerPlus({super.key, required this.modelPath, this.iblPath, this.backgroundPath});
+  /// Model o'z o'qi (Y) atrofida aylanish tezligi — gradus/sekund.
+  /// Default: 30. 0 = avtomatik aylanish o'chirilgan (Yerning o'zi atrofida aylanishi kabi).
+  final double? autoRotationSpeed;
+
+  const ModelViewerPlus({
+    super.key,
+    required this.modelPath,
+    this.iblPath,
+    this.backgroundPath,
+    this.autoRotationSpeed,
+  });
 
   @override
   State<ModelViewerPlus> createState() => _ModelViewerPlusState();
@@ -31,7 +41,12 @@ class _ModelViewerPlusState extends State<ModelViewerPlus> {
 
   /// Creates the parameters to be passed to the platform view.
   dynamic _creationParams() {
-    return {'modelPath': widget.modelPath, 'iblPath': widget.iblPath, 'backgroundPath': widget.backgroundPath};
+    return {
+      'modelPath': widget.modelPath,
+      'iblPath': widget.iblPath,
+      'backgroundPath': widget.backgroundPath,
+      'autoRotationSpeed': widget.autoRotationSpeed,
+    };
   }
 
   /// Called when the platform view is created.
@@ -41,9 +56,6 @@ class _ModelViewerPlusState extends State<ModelViewerPlus> {
     _platform = MethodChannelModelViewerPlus(_viewId);
     ModelViewerPlusPlatform.verify(_platform!);
 
-    // Load the model.
-    await _platform!.loadModel(widget.modelPath);
-
     if(Platform.isAndroid) {
       // Load environment.
       await _platform!.loadEnvironment(widget.iblPath);
@@ -51,6 +63,9 @@ class _ModelViewerPlusState extends State<ModelViewerPlus> {
       // Load environment.
       await _platform!.loadHdrBackground(widget.backgroundPath);
     }
+
+    // Load the model.
+    await _platform!.loadModel(widget.modelPath);
   }
 
   @override

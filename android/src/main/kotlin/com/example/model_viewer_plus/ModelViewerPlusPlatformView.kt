@@ -13,7 +13,8 @@ import java.nio.ByteBuffer
 class ModelViewerPlusPlatformView(
     private val context: Context,
     messenger: BinaryMessenger,
-    id: Int
+    id: Int,
+    creationParams: Any?
 ) : PlatformView, MethodChannel.MethodCallHandler {
     // This is the view that will be returned to Flutter
     private var customView: ModelView
@@ -24,6 +25,12 @@ class ModelViewerPlusPlatformView(
         val v = (context as MutableContextWrapper).baseContext as Activity
         // Initialize the custom view
         customView = ModelView(v)
+
+        // O'z o'qi atrofida aylanish — creationParams dan
+        @Suppress("UNCHECKED_CAST")
+        val params = creationParams as? Map<String, Any?>
+        val autoRotationSpeed = (params?.get("autoRotationSpeed") as? Number)?.toFloat() ?: 30f
+        customView.setAutoRotationSpeed(autoRotationSpeed)
 
         methodChannel.setMethodCallHandler(this)
     }

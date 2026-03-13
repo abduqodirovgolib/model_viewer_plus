@@ -6,6 +6,10 @@ import GLTFSceneKit
 class ModelViewerPlusViewPlatformView: NSObject, FlutterPlatformView {
     private let scnView: SCNView
     private let methodChannel: FlutterMethodChannel
+    /// Model o'z o'qi atrofida aylanish tezligi — gradus/sekund. 0 = o'chirilgan.
+    private var autoRotationSpeed: Float = 30
+    /// Model wrapper node — aylanish uchun
+    private var modelWrapperNode: SCNNode?
 
     init(
         frame: CGRect,
@@ -28,6 +32,11 @@ class ModelViewerPlusViewPlatformView: NSObject, FlutterPlatformView {
         )
 
         super.init()
+
+        if let params = args as? [String: Any],
+           let speed = params["autoRotationSpeed"] as? NSNumber {
+            autoRotationSpeed = speed.floatValue
+        }
 
         methodChannel.setMethodCallHandler(handleMethodCall)
 
@@ -209,12 +218,25 @@ class ModelViewerPlusViewPlatformView: NSObject, FlutterPlatformView {
             child.removeFromParentNode()
             modelWrapper.addChildNode(child)
         }
-        scene.rootNode.addChildNode(modelWrapper)
+
+        // Parent node markazda (0,0,0) — model centerda qoladi, pivot ishlatmaymiz
+        let rotationParent = SCNNode()
+        rotationParent.position = SCNVector3Zero
+        scene.rootNode.addChildNode(rotationParent)
+        rotationParent.addChildNode(modelWrapper)
 
         if maxExtent > 0.001 {
             let scale = Float(2.0) / maxExtent
             modelWrapper.scale = SCNVector3(scale, scale, scale)
             modelWrapper.position = SCNVector3(-center.x * scale, -center.y * scale, -center.z * scale)
+        }
+
+        // Model o'z o'qi (Y) atrofida aylanish — parent markazda, model centerda
+        modelWrapperNode = rotationParent
+        if autoRotationSpeed > 0 {
+            let duration = Double(360) / Double(autoRotationSpeed)
+            let rotateAction = SCNAction.rotateBy(x: 0, y: CGFloat(2 * Float.pi), z: 0, duration: duration)
+            rotationParent.runAction(SCNAction.repeatForever(rotateAction), forKey: "autoRotate")
         }
 
         let cameraNode = SCNNode()

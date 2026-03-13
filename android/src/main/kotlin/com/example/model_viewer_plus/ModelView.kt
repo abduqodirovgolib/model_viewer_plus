@@ -159,6 +159,14 @@ class ModelView : LinearLayout {
     }
 
     /**
+     * Model o'z o'qi (Y) atrofida aylanish tezligini o'rnatadi.
+     * @param degreesPerSec Gradus/sekund. 0 = avtomatik aylanish o'chirilgan.
+     */
+    fun setAutoRotationSpeed(degreesPerSec: Float) {
+        modelViewer.autoRotationSpeedDegPerSec = degreesPerSec
+    }
+
+    /**
      * Destroys the 3D model and stops automation.
      */
     fun destroy() {

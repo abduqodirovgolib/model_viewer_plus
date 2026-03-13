@@ -27,6 +27,7 @@ class _MyAppState extends State<MyApp> {
           child: ModelViewerPlus(
             modelPath: 'assets/models/heart.glb',
             iblPath: 'assets/models/default_env_ibl.ktx',
+            autoRotationSpeed: 8,
           ),
         ),
       ),

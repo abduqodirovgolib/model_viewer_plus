@@ -28,7 +28,7 @@ SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   GLTFSceneKit: d1b437c514ba2aed5555afb0fddd64e030612d57
   integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
-  model_viewer_plus: c34340c1cbc742e9357b9e18de81c61b2c592444
+  model_viewer_plus: 78a742d21daadac020b7086e0f5adf32e4a4c584
 
 PODFILE CHECKSUM: 3c63482e143d1b91d2d2560aee9fb04ecc74ac7e
 

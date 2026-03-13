@@ -1,5 +1,6 @@
 package com.example.model_viewer_plus
 
+import android.opengl.Matrix
 import com.google.android.filament.utils.Float3
 import com.google.android.filament.utils.GestureDetector
 import com.google.android.filament.utils.Manipulator
@@ -105,6 +106,16 @@ class CustomModelViewer(
     private val eyePos = DoubleArray(3)
     private val target = DoubleArray(3)
     private val upward = DoubleArray(3)
+
+    /** Model o'z o'qi (Y o'qi) atrofida aylanish tezligi — gradus/sekund. 0 = o'chirilgan. */
+    var autoRotationSpeedDegPerSec: Float = 30f
+        set(value) { field = value }
+
+    /** Asosiy transform (scale + translation) — aylanish uchun saqlanadi. */
+    private val baseTransform = FloatArray(16).also { Matrix.setIdentityM(it, 0) }
+    private var hasBaseTransform = false
+    /** Model markazi — o'z o'qi atrofida aylanish uchun (boshqa nuqta emas). */
+    private val modelCenter = FloatArray(3)
 
     init {
         renderer = engine.createRenderer()
@@ -223,7 +234,13 @@ class CustomModelViewer(
             val scaleFactor = 2.0f / maxExtent
             center -= centerPoint / scaleFactor
             val transform = scale(Float3(scaleFactor)) * translation(-center)
-            tm.setTransform(tm.getInstance(asset.root), transpose(transform).toFloatArray())
+            val transformArray = transpose(transform).toFloatArray()
+            transformArray.copyInto(baseTransform)
+            modelCenter[0] = centerPoint.x
+            modelCenter[1] = centerPoint.y
+            modelCenter[2] = centerPoint.z
+            hasBaseTransform = true
+            tm.setTransform(tm.getInstance(asset.root), transformArray)
         }
     }
 
@@ -231,6 +248,8 @@ class CustomModelViewer(
      * Removes the transformation that was set up via transformToUnitCube.
      */
     fun clearRootTransform() {
+        hasBaseTransform = false
+        Matrix.setIdentityM(baseTransform, 0)
         asset?.let {
             val tm = engine.transformManager
             tm.setTransform(tm.getInstance(it.root), Mat4().toFloatArray())
@@ -272,6 +291,35 @@ class CustomModelViewer(
 
         // Add renderable entities to the scene as they become ready.
         asset?.let { populateScene(it) }
+
+        // Model o'z o'qi (Y) atrofida aylanish — faqat o'z markazi atrofida, boshqa nuqta emas
+        if (autoRotationSpeedDegPerSec != 0f && hasBaseTransform) {
+            asset?.let { asset ->
+                val elapsedSec = frameTimeNanos / 1_000_000_000.0
+                val angleDeg = (elapsedSec * autoRotationSpeedDegPerSec).toFloat()
+                // Aylanish model markazi atrofida: T(center) * R(y) * T(-center) * base
+                val translateToOrigin = FloatArray(16).also {
+                    Matrix.setIdentityM(it, 0)
+                    Matrix.translateM(it, 0, -modelCenter[0], -modelCenter[1], -modelCenter[2])
+                }
+                val rotationY = FloatArray(16)
+                Matrix.setRotateM(rotationY, 0, angleDeg, 0f, 1f, 0f)
+                val translateBack = FloatArray(16).also {
+                    Matrix.setIdentityM(it, 0)
+                    Matrix.translateM(it, 0, modelCenter[0], modelCenter[1], modelCenter[2])
+                }
+                val temp1 = FloatArray(16)
+                Matrix.multiplyMM(temp1, 0, translateToOrigin, 0, baseTransform, 0)
+                val temp2 = FloatArray(16)
+                Matrix.multiplyMM(temp2, 0, rotationY, 0, temp1, 0)
+                val resultMatrix = FloatArray(16)
+                Matrix.multiplyMM(resultMatrix, 0, translateBack, 0, temp2, 0)
+                engine.transformManager.setTransform(
+                    engine.transformManager.getInstance(asset.root),
+                    resultMatrix
+                )
+            }
+        }
 
         // Extract the camera basis from the helper and push it to the Filament camera.
         cameraManipulator.getLookAt(eyePos, target, upward)
